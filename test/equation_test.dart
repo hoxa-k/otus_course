@@ -2,6 +2,14 @@ import 'package:otus_course/utils/equation.dart';
 import 'package:test/test.dart';
 
 void main() {
+  Matcher throwsArgumentErrorWithMessage(String message) {
+    return throwsA(
+      predicate(
+        (e) => e is ArgumentError && e.message == message,
+      ),
+    );
+  }
+
   test('нет корней', () {
     expect(Equation.solve(1, 0, 1), []);
   });
@@ -17,11 +25,7 @@ void main() {
   test('коэффициент a не может быть равен 0, выдать exception', () {
     expect(
       () => Equation.solve(0, 2, 1),
-      throwsA(
-        predicate(
-          (e) => e is ArgumentError && e.message == 'a cannot be null',
-        ),
-      ),
+      throwsArgumentErrorWithMessage('a cannot be null'),
     );
   });
 
@@ -38,31 +42,19 @@ void main() {
       test('коэффициент a - выдать exception', () {
         expect(
           () => Equation.solve(notNum, 2, 1),
-          throwsA(
-            predicate(
-              (e) => e is ArgumentError && e.message == 'argument not a number',
-            ),
-          ),
+          throwsArgumentErrorWithMessage('argument not a number'),
         );
       });
       test('коэффициент b - выдать exception', () {
         expect(
           () => Equation.solve(2, notNum, 1),
-          throwsA(
-            predicate(
-              (e) => e is ArgumentError && e.message == 'argument not a number',
-            ),
-          ),
+          throwsArgumentErrorWithMessage('argument not a number'),
         );
       });
       test('коэффициент c - выдать exception', () {
         expect(
           () => Equation.solve(2, 2, notNum),
-          throwsA(
-            predicate(
-              (e) => e is ArgumentError && e.message == 'argument not a number',
-            ),
-          ),
+          throwsArgumentErrorWithMessage('argument not a number'),
         );
       });
     }
