@@ -36,14 +36,14 @@ void main() {
     expect(() => RotateCommand(RotatableAdapter(gameObject)).run(), throwsArgumentError);
   });
 
-  test('if can not read velocity then throw exception', () {
+  test('if can not read angular_velocity then throw exception', () {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(10);
     when(gameObject.getProperty('angular_velocity')).thenThrow(ArgumentError());
     expect(() => RotateCommand(RotatableAdapter(gameObject)).run(), throwsArgumentError);
   });
 
-  test('if can not read velocity then throw exception', () {
+  test('if can not set direction then throw exception', () {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(10);
     when(gameObject.setProperty('direction', any)).thenThrow(ArgumentError());

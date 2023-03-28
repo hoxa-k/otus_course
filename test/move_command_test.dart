@@ -35,10 +35,10 @@ void main() {
     expect(() => MoveCommand(MovableAdapter(gameObject)).run(), throwsArgumentError);
   });
 
-  test('if can not read velocity then throw exception', () {
+  test('if can not set position then throw exception', () {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(Point(12, 5));
-    when(gameObject.setProperty(any, any)).thenThrow(ArgumentError());
+    when(gameObject.setProperty('position', any)).thenThrow(ArgumentError());
     expect(() => MoveCommand(MovableAdapter(gameObject)).run(), throwsArgumentError);
   });
 }
