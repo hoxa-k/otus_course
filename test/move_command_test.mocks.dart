@@ -22,12 +22,6 @@ import 'package:otus_course/game/u_object.dart' as _i2;
 /// See the documentation for Mockito's code generation for more information.
 class MockUObject extends _i1.Mock implements _i2.UObject {
   @override
-  Map<String, dynamic> get properties => (super.noSuchMethod(
-        Invocation.getter(#properties),
-        returnValue: <String, dynamic>{},
-        returnValueForMissingStub: <String, dynamic>{},
-      ) as Map<String, dynamic>);
-  @override
   dynamic getProperty(String? key) => super.noSuchMethod(
         Invocation.method(
           #getProperty,

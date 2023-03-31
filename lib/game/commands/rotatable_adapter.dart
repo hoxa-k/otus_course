@@ -1,11 +1,16 @@
+import 'package:otus_course/game/commands/rotatable_interface.dart';
 import 'package:otus_course/game/u_object.dart';
-
-import 'rotatable.dart';
 
 class RotatableAdapter implements Rotatable {
   final UObject object;
 
-  RotatableAdapter(this.object);
+  RotatableAdapter(this.object) {
+    if (object.getProperty('angular_velocity') == null ||
+        object.getProperty('direction') == null ||
+        object.getProperty('directions_number') == null) {
+      throw ArgumentError();
+    }
+  }
 
   @override
   int getAngularVelocity() {
