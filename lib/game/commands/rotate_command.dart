@@ -1,11 +1,14 @@
-import 'rotatable.dart';
+import 'package:otus_course/game/commands/command_interface.dart';
 
-class RotateCommand {
+import 'rotatable_interface.dart';
+
+class RotateCommand implements ICommand{
   final Rotatable rotatable;
 
   RotateCommand(this.rotatable);
 
-  void run() {
+  @override
+  void execute() {
     if (rotatable.getDirectionsNumber() == 0) {
       throw ArgumentError('directions number cannot be 0');
     }

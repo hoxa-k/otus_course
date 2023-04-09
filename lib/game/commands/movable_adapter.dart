@@ -1,8 +1,7 @@
 import 'dart:math';
 
+import 'package:otus_course/game/commands/movable_interface.dart';
 import 'package:otus_course/game/u_object.dart';
-
-import 'movable.dart';
 
 class MovableAdapter implements Movable {
   final UObject object;

@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:otus_course/game/motion/movable_adapter.dart';
-import 'package:otus_course/game/motion/move_command.dart';
+import 'package:otus_course/game/commands/movable_adapter.dart';
+import 'package:otus_course/game/commands/move_command.dart';
 import 'package:otus_course/game/u_object.dart';
 import 'package:test/test.dart';
 import 'package:mockito/annotations.dart';
@@ -16,7 +16,7 @@ void main() {
     gameObject.setProperty('position', Point(12, 5));
     gameObject.setProperty('velocity', Point(-7, 3));
 
-    MoveCommand(MovableAdapter(gameObject)).run();
+    MoveCommand(MovableAdapter(gameObject)).execute();
 
     expect(gameObject.getProperty('position'), Point(5, 8));
   });
@@ -25,20 +25,20 @@ void main() {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(Point(12, 5));
     when(gameObject.getProperty('position')).thenThrow(ArgumentError());
-    expect(() => MoveCommand(MovableAdapter(gameObject)).run(), throwsArgumentError);
+    expect(() => MoveCommand(MovableAdapter(gameObject)).execute(), throwsArgumentError);
   });
 
   test('if can not read velocity then throw exception', () {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(Point(12, 5));
     when(gameObject.getProperty('velocity')).thenThrow(ArgumentError());
-    expect(() => MoveCommand(MovableAdapter(gameObject)).run(), throwsArgumentError);
+    expect(() => MoveCommand(MovableAdapter(gameObject)).execute(), throwsArgumentError);
   });
 
   test('if can not set position then throw exception', () {
     final gameObject = MockUObject();
     when(gameObject.getProperty(any)).thenReturn(Point(12, 5));
     when(gameObject.setProperty('position', any)).thenThrow(ArgumentError());
-    expect(() => MoveCommand(MovableAdapter(gameObject)).run(), throwsArgumentError);
+    expect(() => MoveCommand(MovableAdapter(gameObject)).execute(), throwsArgumentError);
   });
 }
