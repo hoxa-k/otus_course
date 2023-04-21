@@ -14,8 +14,8 @@ class FileRepository implements Repository {
     final fs = fileSystem ?? LocalFileSystem();
     fileIn = fs.file(pathIn);
     fileOut = fs.file(pathOut);
-    if (!fileIn.existsSync()) throw ArgumentError('file not found');
     if (!fileOut.existsSync()) fileOut.createSync();
+    if (!fileIn.existsSync()) throw ArgumentError('file not found');
   }
 
   @override
