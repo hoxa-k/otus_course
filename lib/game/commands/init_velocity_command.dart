@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:otus_course/game/commands/change_velocity_interface.dart';
 import 'package:otus_course/game/commands/command_interface.dart';
-import 'package:vector_math/vector_math.dart';
 
 class InitVelocityCommand implements ICommand {
   final ChangeableVelocity changeableVelocity;

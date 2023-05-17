@@ -5,13 +5,14 @@ import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/exceptions/exception_handler.dart';
 import 'package:otus_course/game/startable_queue_interface.dart';
+import 'package:rxdart/subjects.dart';
 
 typedef Action = Future<void> Function(SeparateGameLoop gameLoop);
 
 class SeparateGameLoop implements CommandQueue, StartableQueue {
   late final StreamQueue commandsStreamQueue;
   late final exceptionHandler = ExceptionHandler(this);
-  final queueStreamController = StreamController<ICommand>();
+  final queueStreamController = BehaviorSubject<ICommand>();
   bool repeat = true;
   Action action = (gameLoop) async {
     final command = await gameLoop.commandsStreamQueue.next;
@@ -35,11 +36,16 @@ class SeparateGameLoop implements CommandQueue, StartableQueue {
       await action(this);
       _eventsExecuted++;
     }
+    _dispose();
   }
 
   @override
   void putCommand(ICommand command) {
     _eventsAdded++;
     queueStreamController.add(command);
+  }
+
+  void _dispose() {
+    queueStreamController.close();
   }
 }

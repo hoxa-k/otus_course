@@ -1,6 +1,6 @@
 abstract class Interpretable {
-  int getGameId();
-  int getObjectId();
+  String getGameId();
+  String getObjectId();
   String getOperationId();
-  dynamic getArgs();
+  dynamic? getArgs();
 }

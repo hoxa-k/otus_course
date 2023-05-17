@@ -2,7 +2,7 @@ import 'package:otus_course/game/commands/command_interface.dart';
 
 class RepeatCommand implements ICommand {
   final ICommand command;
-  final Exception exception;
+  final dynamic exception;
 
   RepeatCommand(this.command, {required this.exception});
 

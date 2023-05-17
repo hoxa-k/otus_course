@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:otus_course/game/commands/change_velocity_interface.dart';
+import 'package:otus_course/game/commands/change_velocity_and_rotation_interface.dart';
 import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:vector_math/vector_math.dart';
 
 class ChangeVelocityCommand implements ICommand {
-  final ChangeableVelocity changeableVelocity;
+  final ChangeableVelocityAndRotation changeableVelocity;
 
   ChangeVelocityCommand(this.changeableVelocity) {
     if (changeableVelocity.getDirectionsNumber() == 0) throw ArgumentError();

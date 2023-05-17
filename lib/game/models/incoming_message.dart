@@ -1,6 +1,6 @@
 class IncomingMessage {
-  final int gameId;
-  final int gameObjectId;
+  final String gameId;
+  final String gameObjectId;
   final String commandId;
   final dynamic? args;
 

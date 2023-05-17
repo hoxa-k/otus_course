@@ -1,21 +1,20 @@
 import 'dart:math';
 
 import 'package:otus_course/game/commands/change_velocity_interface.dart';
-import 'package:otus_course/game/commands/rotatable_adapter.dart';
 import 'package:otus_course/game/u_object.dart';
 
-class ChangeVelocityAdapter extends RotatableAdapter
-    implements ChangeableVelocity {
-  ChangeVelocityAdapter(UObject object) : super(object);
+class ChangeVelocityAdapter implements ChangeableVelocity {
+  final UObject object;
+
+  ChangeVelocityAdapter(this.object);
 
   @override
-  Point<num>? getVelocity() {
+  Point? getVelocity() {
     return object.getProperty('velocity');
   }
 
   @override
-  void setVelocity(Point<num> velocity) {
+  void setVelocity(Point velocity) {
     object.setProperty('velocity', velocity);
   }
-
 }

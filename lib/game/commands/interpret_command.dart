@@ -11,19 +11,47 @@ class InterpretCommand implements ICommand {
 
   @override
   void execute() {
+    /*
+    {
+      'game_id': 'simple_game',
+      'object_id': '548',
+      'operation_id': 'move',
+      'args': [0,2],
+    }
+    */
+
+    //получаем игровой  объект
     final obj = IoC.get<UObject>(
       instanceName: 'GameObject',
       param1: interpretableObject.getObjectId(),
     ); // "548" получено из входящего сообщения
+
+    //получаем команду инициализации игрового объекта
+    final initCommandName = IoC.get<Map<String, Map<String, String>>>(
+      instanceName: 'GameCommands',
+    )[interpretableObject.getGameId()]?['init'];
     IoC.get<ICommand>(
-      instanceName: 'Command.InitVelocity',
+      instanceName: 'Command.$initCommandName',
       param1: obj,
       param2: interpretableObject.getArgs(),
-    ); // значение 2 получено из args переданного в сообщении
-    final cmd = IoC.get<ICommand>(instanceName: 'Command.Move', param1: obj);
+    ).execute();
+
+    //получаем команду движения
+    final commandName = IoC.get<Map<String, Map<String, String>>>(
+      instanceName: 'GameCommands',
+    )[interpretableObject.getGameId()]?[interpretableObject.getOperationId()];
+    final cmd = IoC.get<ICommand>(
+      instanceName: 'Command.$commandName',
+      param1: obj,
+      param2: interpretableObject.getArgs(),
+    );
+
+    //получаем очередь игры
     final gameQueue = IoC.get<CommandQueue>(
       param1: interpretableObject.getGameId(),
     );
+
+    //ставим команду в очередь игры
     IoC.get<ICommand>(
       instanceName: 'Helpers.PutToQueue',
       param1: gameQueue,
