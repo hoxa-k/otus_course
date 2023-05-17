@@ -10,7 +10,7 @@ class MovableAdapter implements Movable {
 
   @override
   Point<num> getPosition() {
-    return (object.getProperty('position') ?? Point(0,0) ) as Point<num> ;
+    return object.getProperty('position') as Point<num> ;
   }
 
   @override
