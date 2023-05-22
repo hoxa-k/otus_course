@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:otus_course/game/commands/rotatable_interface.dart';
-
-abstract class ChangeableVelocity implements Rotatable{
+abstract class ChangeableVelocity{
     Point? getVelocity();
     void setVelocity(Point velocity);
 }

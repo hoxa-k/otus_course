@@ -1,4 +1,4 @@
-import 'package:otus_course/game/commands/change_velocity_adapter.dart';
+import 'package:otus_course/game/commands/change_velocity_and_rotation_adapter.dart';
 import 'package:otus_course/game/commands/change_velocity_command.dart';
 import 'package:otus_course/game/commands/macro/macro_command.dart';
 import 'package:otus_course/game/commands/rotatable_adapter.dart';
@@ -10,7 +10,7 @@ class RotateAndChangeVelocityCommand extends MacroCommand {
       : super(
           commandList: [
             RotateCommand(RotatableAdapter(obj)),
-            ChangeVelocityCommand(ChangeVelocityAdapter(obj)),
+            ChangeVelocityCommand(ChangeVelocityAndRotationAdapter(obj)),
           ],
         );
 }
