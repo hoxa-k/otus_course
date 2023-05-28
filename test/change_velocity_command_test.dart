@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:otus_course/game/commands/change_velocity_adapter.dart';
 import 'package:otus_course/game/commands/change_velocity_and_rotation_adapter.dart';
 import 'package:otus_course/game/commands/change_velocity_command.dart';
 import 'package:otus_course/game/u_object.dart';

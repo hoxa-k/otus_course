@@ -49,11 +49,11 @@ void initIoC() {
   };
 
   //Register commands
-  IoC.registerFactoryParam<ICommand, UObject, dynamic?>(
+  IoC.registerFactoryParam<ICommand, UObject, dynamic>(
     (param1, param2) => MoveCommand(MovableAdapter(param1)),
     instanceName: 'Command.Move',
   );
-  IoC.registerFactoryParam<ICommand, UObject, dynamic?>(
+  IoC.registerFactoryParam<ICommand, UObject, dynamic>(
     (param1, param2) => InitVelocityCommand(
       ChangeVelocityAdapter(param1),
       VelocityValueAdapter.argsToPoint(param2),

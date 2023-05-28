@@ -12,7 +12,7 @@ class WebSocketEndpoint {
   static const host = 'localhost';
 
   int _connectionCount = 0;
-  Map<String, WebSocket> _connections = {};
+  final Map<String, WebSocket> _connections = {};
 
   Future<void> start() async {
     HttpServer server = await HttpServer.bind(host, port);

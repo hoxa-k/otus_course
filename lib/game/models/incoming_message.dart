@@ -2,7 +2,7 @@ class IncomingMessage {
   final String gameId;
   final String gameObjectId;
   final String commandId;
-  final dynamic? args;
+  final dynamic args;
 
   IncomingMessage({
     required this.gameId,
