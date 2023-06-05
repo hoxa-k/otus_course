@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:mockito/mockito.dart';
+import 'package:otus_course/common_tools/network/web_socket_endpoint.dart';
 import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commands/control/hard_stop_command.dart';
 import 'package:otus_course/game/commands/control/start_command.dart';
@@ -26,46 +27,82 @@ void main() {
     'args': [0, 2],
   };
 
+  //jwt for {'user': 'user1', 'game_id': 'simple'}
+  final jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
+
+  final incomingMessageJsonWithJwt = {
+    'game_id': 'simple',
+    'game_object_id': '548',
+    'command_id': 'move',
+    'jwt': jwt,
+    'args': [0, 2],
+  };
+
+  final incomingMessageJsonWithJwtAndWrongGameId = {
+    'game_id': 'simple123',
+    'game_object_id': '548',
+    'command_id': 'move',
+    'jwt': jwt,
+    'args': [0, 2],
+  };
+
   late final SeparateGameLoop commandQueue;
   late final WebSocketEndpoint endpoint;
   late final WebSocket client;
 
-  setUpAll(() {
+  setUpAll(() async {
     commandQueue = SeparateGameLoop();
-    endpoint = WebSocketEndpoint();
+    endpoint = GameWebSocketEndpoint();
 
     initIoC();
     IoC.pushNewScope(scopeName: 'test');
     IoC.get<Map<String, CommandQueue>>(instanceName: 'GameThreads')['simple'] =
         commandQueue;
+    IoC.registerSingleton<String>('SecretKey', instanceName: 'SecretKey');
 
     final gameObject = UObject();
     gameObject.setProperty('id', '548');
     gameObject.setProperty('position', Point(0, 0));
     IoC.get<List<UObject>>(instanceName: 'GameObjects').add(gameObject);
+    client = WebSocket(Uri(
+      scheme: 'ws',
+      host: endpoint.host,
+      port: endpoint.port,
+    ));
+    await endpoint.start();
+    StartCommand(commandQueue).execute();
+    await client.connection.firstWhere((state) => state is Connected);
   });
 
-  tearDown(() {
+  tearDownAll(() {
+    commandQueue.putCommand(HardStopCommand(commandQueue));
     client.close();
   });
 
   group('web socket endpoint test', () {
     test('if client send message then get InterpretCommand and MoveCommand',
         () async {
-      client = WebSocket(Uri(
-        scheme: 'ws',
-        host: WebSocketEndpoint.host,
-        port: WebSocketEndpoint.port,
-      ));
-      await endpoint.start();
-      StartCommand(commandQueue).execute();
-      await client.connection.firstWhere((state) => state is Connected);
-      client.send(jsonEncode(incomingMessageJson));
+      client.send(jsonEncode(incomingMessageJsonWithJwt));
       await expectLater(
         commandQueue.queueStreamController.stream,
         emitsInOrder([isA<InterpretCommand>(), isA<MoveCommand>()]),
       );
-      commandQueue.putCommand(HardStopCommand(commandQueue));
     });
+    test('if client send message without jwt, no commands generate',
+            () async {
+          client.send(jsonEncode(incomingMessageJson));
+          await expectLater(
+            commandQueue.queueStreamController.stream,
+            emitsInOrder([]),
+          );
+        });
+    test('if client send message with jwt but wrong gameId, no commands generate',
+            () async {
+          client.send(jsonEncode(incomingMessageJsonWithJwtAndWrongGameId));
+          await expectLater(
+            commandQueue.queueStreamController.stream,
+            emitsInOrder([]),
+          );
+        });
   });
 }
