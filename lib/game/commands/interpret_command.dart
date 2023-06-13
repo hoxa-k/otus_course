@@ -1,7 +1,6 @@
 import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commands/interpretable.dart';
 import 'package:otus_course/game/commands/macro/macro_command.dart';
-import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/u_object.dart';
 import 'package:otus_course/ioc.dart';
 
