@@ -1,4 +1,3 @@
-import 'package:otus_course/game/exceptions/command_exception.dart';
 import 'package:otus_course/game/commands/command_interface.dart';
 
 class MacroCommand implements ICommand {
@@ -12,7 +11,7 @@ class MacroCommand implements ICommand {
       try {
         command.execute();
       } catch (ex) {
-        throw CommandException('from macro command');
+        rethrow;
       }
     }
   }

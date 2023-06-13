@@ -92,8 +92,8 @@ void _initQueue(String gameId) {
 
   IoC.get<Map<String, Map<String, String>>>(
       instanceName: 'GameCommands')[gameId] = {
-    'move': 'Move',
     'init': 'InitVelocity',
+    'move': 'Move',
   };
 }
 
