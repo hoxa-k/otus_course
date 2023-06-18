@@ -7,7 +7,7 @@ import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commands/control/hard_stop_command.dart';
 import 'package:otus_course/game/commands/control/start_command.dart';
 import 'package:otus_course/game/commands/interpret_command.dart';
-import 'package:otus_course/game/commands/move_command.dart';
+import 'package:otus_course/game/commands/macro/macro_command.dart';
 import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/init_ioc.dart';
 import 'package:otus_course/game/separate_game_loop.dart';
@@ -56,6 +56,11 @@ void main() {
 
     initIoC();
     IoC.pushNewScope(scopeName: 'test');
+    IoC.get<Map<String, Map<String, String>>>(
+        instanceName: 'GameCommands')['simple'] = {
+      'init': 'InitVelocity',
+      'move': 'Move',
+    };
     IoC.get<Map<String, CommandQueue>>(instanceName: 'GameThreads')['simple'] =
         commandQueue;
     IoC.registerSingleton<String>('SecretKey', instanceName: 'SecretKey');
@@ -85,7 +90,7 @@ void main() {
       client.send(jsonEncode(incomingMessageJsonWithJwt));
       await expectLater(
         commandQueue.queueStreamController.stream,
-        emitsInOrder([isA<InterpretCommand>(), isA<MoveCommand>()]),
+        emitsInOrder([isA<InterpretCommand>(), isA<MacroCommand>()]),
       );
     });
     test('if client send message without jwt, no commands generate',
