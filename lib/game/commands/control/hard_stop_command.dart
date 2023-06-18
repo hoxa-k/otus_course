@@ -1,4 +1,5 @@
 import 'package:otus_course/game/commands/command_interface.dart';
+import 'package:otus_course/game/game_loop_stop_state.dart';
 import 'package:otus_course/game/separate_game_loop.dart';
 
 class HardStopCommand implements ICommand {
@@ -8,6 +9,6 @@ class HardStopCommand implements ICommand {
 
   @override
   void execute() {
-    queue.repeat = false;
+    queue.setState(GameLoopStopState(queue));
   }
 }

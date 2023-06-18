@@ -5,27 +5,34 @@ import 'package:otus_course/game/commands/control/start_command.dart';
 import 'package:otus_course/game/separate_game_loop.dart';
 import 'package:test/test.dart';
 
-
 class MockICommand extends Mock implements ICommand {}
 
 void main() {
   group('soft stop queue command test', () {
-    test('SoftStopCommand stop cycle when queue is empty', ()
-    async {
+    test('SoftStopCommand stop cycle when queue is empty', () async {
       final loop = SeparateGameLoop();
       final command = MockICommand();
-      final hardStopCommand = SoftStopCommand(loop);
       Future.sync(() => StartCommand(loop).execute());
-      loop.queueStreamController.onCancel =
-          () {
-            verify(command.execute()).called(5);
-            expect(loop.commandsStreamQueue.eventsDispatched, 5);
-          };
+      final softStopCommand = SoftStopCommand(loop);
+
+      final streamMatcher = expectLater(
+          loop.queueStreamController.stream.toList(),
+          completion([
+            isA<MockICommand>(),
+            isA<MockICommand>(),
+            isA<SoftStopCommand>(),
+            isA<MockICommand>(),
+            isA<MockICommand>()
+          ]));
+
       loop.putCommand(command);
       loop.putCommand(command);
-      loop.putCommand(hardStopCommand);
+      loop.putCommand(softStopCommand);
       loop.putCommand(command);
       loop.putCommand(command);
+
+      await streamMatcher;
+      verify(command.execute()).called(4);
     });
   });
 }
