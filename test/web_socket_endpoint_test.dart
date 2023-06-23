@@ -28,7 +28,8 @@ void main() {
   };
 
   //jwt for {'user': 'user1', 'game_id': 'simple'}
-  final jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
+  final jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
 
   final incomingMessageJsonWithJwt = {
     'game_id': 'simple',
@@ -55,10 +56,8 @@ void main() {
     commandQueue = SeparateGameLoop();
     endpoint = GameWebSocketEndpoint();
     IoC.pushNewScope(scopeName: 'test');
-    IoC.get<Map<String, Map<String, String>>>(
-        instanceName: 'GameCommands')['simple'] = {
-      'init': 'InitVelocity',
-      'move': 'Move',
+    IoC.get<GameCommandsMap>(instanceName: 'GameCommands')['simple'] = {
+      'move': ['InitVelocity', 'Move'],
     };
     IoC.get<Map<String, CommandQueue>>(instanceName: 'GameThreads')['simple'] =
         commandQueue;
@@ -92,21 +91,21 @@ void main() {
         emitsInOrder([isA<InterpretCommand>(), isA<MacroCommand>()]),
       );
     });
-    test('if client send message without jwt, no commands generate',
-            () async {
-          client.send(jsonEncode(incomingMessageJson));
-          await expectLater(
-            commandQueue.queueStreamController.stream,
-            emitsInOrder([]),
-          );
-        });
-    test('if client send message with jwt but wrong gameId, no commands generate',
-            () async {
-          client.send(jsonEncode(incomingMessageJsonWithJwtAndWrongGameId));
-          await expectLater(
-            commandQueue.queueStreamController.stream,
-            emitsInOrder([]),
-          );
-        });
+    test('if client send message without jwt, no commands generate', () async {
+      client.send(jsonEncode(incomingMessageJson));
+      await expectLater(
+        commandQueue.queueStreamController.stream,
+        emitsInOrder([]),
+      );
+    });
+    test(
+        'if client send message with jwt but wrong gameId, no commands generate',
+        () async {
+      client.send(jsonEncode(incomingMessageJsonWithJwtAndWrongGameId));
+      await expectLater(
+        commandQueue.queueStreamController.stream,
+        emitsInOrder([]),
+      );
+    });
   });
 }

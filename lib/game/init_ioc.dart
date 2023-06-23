@@ -5,6 +5,7 @@ import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commands/helpers/put_to_queue_command.dart';
 import 'package:otus_course/game/commands/init_velocity_command.dart';
 import 'package:otus_course/game/commands/move_command.dart';
+import 'package:otus_course/game/commands/stop_move_command.dart';
 import 'package:otus_course/game/commands/velocity_value_adapter.dart';
 import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/game_loop.dart';
@@ -46,16 +47,22 @@ void initIoC() {
   );
 
   //Register id of commands for games
-  IoC.registerSingleton(
-    <String, Map<String, String>>{},
-    instanceName: 'GameCommands',
-  );
-  IoC.get<Map<String, Map<String, String>>>(
-      instanceName: 'GameCommands')['simple'] = {
-    'move': 'Move',
-    'init': 'InitVelocity',
-    'check_collisions': 'RegisterInGameField',
-    'check_collisions2': 'RegisterInGameFieldWithOffset',
+  IoC.registerSingleton(GameCommandsMap(), instanceName: 'GameCommands');
+  IoC.get<GameCommandsMap>(instanceName: 'GameCommands')['simple'] = {
+    'StartMove': [
+      'InitVelocity',
+      'Move',
+      'RegisterInGameField',
+      'RegisterInGameFieldWithOffset'
+    ],
+    'Move': [
+      'Move',
+      'RegisterInGameField',
+      'RegisterInGameFieldWithOffset'
+    ],
+    'StopMove': [
+      'StopMove',
+    ],
   };
 
   IoC.registerSingleton(
@@ -78,6 +85,10 @@ void initIoC() {
       VelocityValueAdapter.argsToPoint(param2),
     ),
     instanceName: 'Command.InitVelocity',
+  );
+  IoC.registerFactoryParam<ICommand, UObject, dynamic>(
+    (param1, _) => StopMoveCommand(ChangeVelocityAdapter(param1)),
+    instanceName: 'Command.StopMove',
   );
   IoC.registerFactoryParam<ICommand, UObject, dynamic>(
     (param1, param2) => RegisterInGameFieldCommand(
