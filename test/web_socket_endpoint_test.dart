@@ -51,10 +51,9 @@ void main() {
   late final WebSocket client;
 
   setUpAll(() async {
+    initIoC();
     commandQueue = SeparateGameLoop();
     endpoint = GameWebSocketEndpoint();
-
-    initIoC();
     IoC.pushNewScope(scopeName: 'test');
     IoC.get<Map<String, Map<String, String>>>(
         instanceName: 'GameCommands')['simple'] = {

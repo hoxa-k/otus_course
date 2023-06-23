@@ -1,39 +1,36 @@
-import 'dart:async';
-
 import 'package:async/async.dart';
 import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/exceptions/exception_handler.dart';
+import 'package:otus_course/game/game_loop_default_state.dart';
+import 'package:otus_course/game/game_loop_state.dart';
 import 'package:otus_course/game/startable_queue_interface.dart';
 import 'package:rxdart/subjects.dart';
-
-typedef Action = Future<void> Function(SeparateGameLoop gameLoop);
 
 class SeparateGameLoop implements CommandQueue, StartableQueue {
   late final StreamQueue commandsStreamQueue;
   late final exceptionHandler = ExceptionHandler(this);
   final queueStreamController = BehaviorSubject<ICommand>();
   bool repeat = true;
-  Action action = (gameLoop) async {
-    final command = await gameLoop.commandsStreamQueue.next;
-    try {
-      command.execute();
-    } catch (e) {
-      gameLoop.exceptionHandler.handle(e, command);
-    }
-  };
+  late GameLoopState state;
 
   bool get queueIsNotEmpty => _eventsAdded - _eventsExecuted != 0;
   int _eventsExecuted = 0;
   int _eventsAdded = 0;
 
-  SeparateGameLoop();
+  SeparateGameLoop() {
+    state = GameLoopDefaultState(this);
+  }
+
+  void setState(GameLoopState state) {
+    this.state = state;
+  }
 
   @override
   void start() async {
     commandsStreamQueue = StreamQueue<ICommand>(queueStreamController.stream);
-    while (repeat) {
-      await action(this);
+    while (state.action() != null) {
+      await state.action()?.call();
       _eventsExecuted++;
     }
     _dispose();
