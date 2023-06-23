@@ -15,7 +15,7 @@ class InterpretCommand implements ICommand {
     {
       'game_id': 'simple_game',
       'object_id': '548',
-      'operation_id': 'move',
+      'operation_id': 'StartMove',
       'args': [0,2],
     }
     */
@@ -26,15 +26,21 @@ class InterpretCommand implements ICommand {
       param1: interpretableObject.getObjectId(),
     ); // "548" получено из входящего сообщения
 
+    if (obj.isEmpty) throw Exception('Object not found');
     //очередность комманд для цепочки обязанностей игрового объекта
     // берем из IoC GameCommands
-    final gameCommands = IoC.get<Map<String, Map<String, String>>>(
+    // по operation_id
+    final operation = interpretableObject.getOperationId();
+    final gameId = interpretableObject.getGameId();
+    final gameCommands = IoC.get<GameCommandsMap>(
       instanceName: 'GameCommands',
-    )[interpretableObject.getGameId()]?.values.map((e) => IoC.get<ICommand>(
-      instanceName: 'Command.$e',
-      param1: obj,
-      param2: interpretableObject.getArgs(),
-    )).toList();
+    )[gameId]?[operation]
+        ?.map((e) => IoC.get<ICommand>(
+              instanceName: 'Command.$e',
+              param1: obj,
+              param2: interpretableObject.getArgs(),
+            ))
+        .toList();
 
     if (gameCommands == null || gameCommands.isEmpty) return;
 

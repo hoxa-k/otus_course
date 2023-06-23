@@ -28,7 +28,8 @@ void main() {
   };
 
   //jwt for {'user': 'user1', 'game_id': 'simple'}
-  final jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
+  final jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
 
   final incomingMessageJsonWithJwt = {
     'game_id': 'simple',
@@ -46,6 +47,14 @@ void main() {
     'args': [0, 2],
   };
 
+  final incomingMessageJsonForAnotherObject = {
+    'game_id': 'simple',
+    'game_object_id': '549',
+    'command_id': 'move',
+    'jwt': jwt,
+    'args': [0, 2],
+  };
+
   late final SeparateGameLoop commandQueue;
   late final WebSocketEndpoint endpoint;
   late final WebSocket client;
@@ -55,10 +64,8 @@ void main() {
     commandQueue = SeparateGameLoop();
     endpoint = GameWebSocketEndpoint();
     IoC.pushNewScope(scopeName: 'test');
-    IoC.get<Map<String, Map<String, String>>>(
-        instanceName: 'GameCommands')['simple'] = {
-      'init': 'InitVelocity',
-      'move': 'Move',
+    IoC.get<GameCommandsMap>(instanceName: 'GameCommands')['simple'] = {
+      'move': ['InitVelocity', 'Move'],
     };
     IoC.get<Map<String, CommandQueue>>(instanceName: 'GameThreads')['simple'] =
         commandQueue;
@@ -67,6 +74,7 @@ void main() {
     final gameObject = UObject();
     gameObject.setProperty('id', '548');
     gameObject.setProperty('position', Point(0, 0));
+    gameObject.setProperty('owner', 'user1');
     IoC.get<List<UObject>>(instanceName: 'GameObjects').add(gameObject);
     client = WebSocket(Uri(
       scheme: 'ws',
@@ -77,6 +85,14 @@ void main() {
     StartCommand(commandQueue).execute();
     await client.connection.firstWhere((state) => state is Connected);
   });
+
+  void setUpForAnotherObject() {
+    final gameObject = UObject();
+    gameObject.setProperty('id', '549');
+    gameObject.setProperty('position', Point(0, 0));
+    gameObject.setProperty('owner', 'user2');
+    IoC.get<List<UObject>>(instanceName: 'GameObjects').add(gameObject);
+  }
 
   tearDownAll(() {
     commandQueue.putCommand(HardStopCommand(commandQueue));
@@ -92,17 +108,28 @@ void main() {
         emitsInOrder([isA<InterpretCommand>(), isA<MacroCommand>()]),
       );
     });
-    test('if client send message without jwt, no commands generate',
+    test('if client send message without jwt, no commands generate', () async {
+      client.send(jsonEncode(incomingMessageJson));
+      await expectLater(
+        commandQueue.queueStreamController.stream,
+        emitsInOrder([]),
+      );
+    });
+    test(
+        'if client send message with jwt but wrong gameId, no commands generate',
+        () async {
+      client.send(jsonEncode(incomingMessageJsonWithJwtAndWrongGameId));
+      await expectLater(
+        commandQueue.queueStreamController.stream,
+        emitsInOrder([]),
+      );
+    });
+    test(
+        'if client send message to another\'s object, no commands generate',
             () async {
-          client.send(jsonEncode(incomingMessageJson));
-          await expectLater(
-            commandQueue.queueStreamController.stream,
-            emitsInOrder([]),
-          );
-        });
-    test('if client send message with jwt but wrong gameId, no commands generate',
-            () async {
-          client.send(jsonEncode(incomingMessageJsonWithJwtAndWrongGameId));
+              setUpForAnotherObject();
+
+          client.send(jsonEncode(incomingMessageJsonForAnotherObject));
           await expectLater(
             commandQueue.queueStreamController.stream,
             emitsInOrder([]),
