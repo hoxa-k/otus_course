@@ -47,6 +47,7 @@ void initIoC() {
   );
 
   //Register id of commands for games
+  // ignore: prefer_collection_literals
   IoC.registerSingleton(GameCommandsMap(), instanceName: 'GameCommands');
   IoC.get<GameCommandsMap>(instanceName: 'GameCommands')['simple'] = {
     'StartMove': [

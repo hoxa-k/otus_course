@@ -4,20 +4,13 @@ import 'package:otus_course/game/commands/command_interface.dart';
 import 'package:otus_course/game/commands/interpret_command.dart';
 import 'package:otus_course/game/commands/interpretable_adapter.dart';
 import 'package:otus_course/game/commands/macro/macro_command.dart';
-import 'package:otus_course/game/commands/movable_adapter.dart';
-import 'package:otus_course/game/commands/move_command.dart';
 import 'package:otus_course/game/commnd_queue_interface.dart';
 import 'package:otus_course/game/init_ioc.dart';
-import 'package:otus_course/game/models/incoming_message.dart';
 import 'package:otus_course/game/separate_game_loop.dart';
 import 'package:otus_course/game/u_object.dart';
 import 'package:otus_course/ioc.dart';
 import 'package:test/test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-
-@GenerateNiceMocks([MockSpec<UObject>()])
-import 'move_command_test.mocks.dart';
 
 class MockMoveCommand extends Mock implements ICommand {}
 
@@ -30,21 +23,21 @@ void main() {
   final jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcjEiLCJnYW1lX2lkIjoic2ltcGxlIiwiaWF0IjoxNjg1OTUwMzQxfQ.QMKeTMjRExl31vWgndUbhbGqXb7uhGXwUPkTVL8FDpg';
 
-  final messageStartMove = {
+  final messageStartMove = UObject.fromJson({
     'game_id': 'simple',
     'game_object_id': '548',
     'command_id': 'start_move',
     'jwt': jwt,
     'args': [0, 2],
-  };
+  });
 
-  final messageStopMove = {
+  final messageStopMove = UObject.fromJson({
     'game_id': 'simple',
     'game_object_id': '548',
     'command_id': 'stop_move',
     'jwt': jwt,
     'args': [0, 2],
-  };
+  });
 
   late final SeparateGameLoop commandQueue;
 
@@ -81,32 +74,28 @@ void main() {
 
   group('interpret command test', () {
     test('interpret command создает макрокоманду', () async {
-      InterpretCommand(InterpretableAdapter(
-              IncomingMessage.fromJson(messageStartMove)))
-          .execute();
+      InterpretCommand(InterpretableAdapter(messageStartMove)).execute();
 
       await expectLater(
-          commandQueue.queueStreamController.stream,
-          emitsInOrder([isA<MacroCommand>()]),
+        commandQueue.queueStreamController.stream,
+        emitsInOrder([isA<MacroCommand>()]),
       );
     });
     test('если command_id start_move, то 2 команды в макрокоманде', () async {
-      InterpretCommand(InterpretableAdapter(
-          IncomingMessage.fromJson(messageStartMove)))
-          .execute();
+      InterpretCommand(InterpretableAdapter(messageStartMove)).execute();
 
-      final macroCommand = await commandQueue.queueStreamController.stream.first;
+      final macroCommand =
+          await commandQueue.queueStreamController.stream.first;
       await expectLater(
         (macroCommand as MacroCommand).commandList,
         containsAllInOrder([isA<MockInitCommand>(), isA<MockMoveCommand>()]),
       );
     });
     test('если command_id stop_move, то 1 команда в макрокоманде', () async {
-      InterpretCommand(InterpretableAdapter(
-          IncomingMessage.fromJson(messageStopMove)))
-          .execute();
+      InterpretCommand(InterpretableAdapter(messageStopMove)).execute();
 
-      final macroCommand = await commandQueue.queueStreamController.stream.first;
+      final macroCommand =
+          await commandQueue.queueStreamController.stream.first;
       await expectLater(
         (macroCommand as MacroCommand).commandList,
         containsAllInOrder([isA<MockStopCommand>()]),

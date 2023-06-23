@@ -47,6 +47,14 @@ void main() {
     'args': [0, 2],
   };
 
+  final incomingMessageJsonForAnotherObject = {
+    'game_id': 'simple',
+    'game_object_id': '549',
+    'command_id': 'move',
+    'jwt': jwt,
+    'args': [0, 2],
+  };
+
   late final SeparateGameLoop commandQueue;
   late final WebSocketEndpoint endpoint;
   late final WebSocket client;
@@ -66,6 +74,7 @@ void main() {
     final gameObject = UObject();
     gameObject.setProperty('id', '548');
     gameObject.setProperty('position', Point(0, 0));
+    gameObject.setProperty('owner', 'user1');
     IoC.get<List<UObject>>(instanceName: 'GameObjects').add(gameObject);
     client = WebSocket(Uri(
       scheme: 'ws',
@@ -76,6 +85,14 @@ void main() {
     StartCommand(commandQueue).execute();
     await client.connection.firstWhere((state) => state is Connected);
   });
+
+  void setUpForAnotherObject() {
+    final gameObject = UObject();
+    gameObject.setProperty('id', '549');
+    gameObject.setProperty('position', Point(0, 0));
+    gameObject.setProperty('owner', 'user2');
+    IoC.get<List<UObject>>(instanceName: 'GameObjects').add(gameObject);
+  }
 
   tearDownAll(() {
     commandQueue.putCommand(HardStopCommand(commandQueue));
@@ -107,5 +124,16 @@ void main() {
         emitsInOrder([]),
       );
     });
+    test(
+        'if client send message to another\'s object, no commands generate',
+            () async {
+              setUpForAnotherObject();
+
+          client.send(jsonEncode(incomingMessageJsonForAnotherObject));
+          await expectLater(
+            commandQueue.queueStreamController.stream,
+            emitsInOrder([]),
+          );
+        });
   });
 }

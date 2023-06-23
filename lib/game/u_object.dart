@@ -7,6 +7,10 @@ class UObject {
 
   factory UObject.fromJson(Map<String, dynamic> json) => UObject._(json);
 
+  factory UObject.empty() => UObject();
+
+  bool get isEmpty => _properties.isEmpty;
+
   dynamic getProperty(String key) {
     return _properties[key];
   }

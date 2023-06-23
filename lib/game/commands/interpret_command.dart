@@ -26,6 +26,7 @@ class InterpretCommand implements ICommand {
       param1: interpretableObject.getObjectId(),
     ); // "548" получено из входящего сообщения
 
+    if (obj.isEmpty) throw Exception('Object not found');
     //очередность комманд для цепочки обязанностей игрового объекта
     // берем из IoC GameCommands
     // по operation_id

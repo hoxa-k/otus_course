@@ -1,25 +1,19 @@
+import 'package:otus_course/game/u_object.dart';
+
 class IncomingMessage {
-  final String gameId;
-  final String gameObjectId;
-  final String commandId;
-  final String? jwt;
-  final dynamic args;
+  UObject object;
 
-  IncomingMessage({
-    required this.gameId,
-    required this.gameObjectId,
-    required this.commandId,
-    this.jwt,
-    this.args,
-  });
+  IncomingMessage(this.object);
 
-  factory IncomingMessage.fromJson(Map<String, dynamic> json) {
-    return IncomingMessage(
-      gameId: json['game_id'],
-      gameObjectId: json['game_object_id'],
-      commandId: json['command_id'],
-      args: json['args'],
-      jwt: json['jwt'],
-    );
+  String get gameId => object.getProperty('game_id');
+  String get gameObjectId => object.getProperty('game_object_id');
+  String get commandId => object.getProperty('command_id');
+  String? get jwt => object.getProperty('jwt');
+  dynamic get args => object.getProperty('args');
+
+  String get owner => object.getProperty('owner');
+  set owner(String owner) {
+    object.setProperty('owner', owner);
   }
+
 }
